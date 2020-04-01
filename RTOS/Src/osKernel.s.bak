@@ -1,0 +1,76 @@
+    AREA | .text|,CODE,READONLY,ALIGN=2
+		THUMB 
+    PRESERVE8
+		EXTERN currentPt
+    EXTERN uwTick
+    EXTERN uwTickFreq
+    IMPORT HAL_IncTick
+    IMPORT GreenLedToggle
+
+   EXPORT SysTick_Handler
+   ; EXPORT osSchedulerLauch
+
+
+SysTick_Handler ; SysTick 中断只属于 cortex 系列
+  push {r0,lr}
+  BL HAL_IncTick ; HAL 中的计数器函数
+  pop {r0,lr}
+
+  ;push {lr}
+  ;bl GreenLedToggle
+  ;pop {lr}
+  
+  CPSID I
+  PUSH{R4 - R11}
+  LDR R0,=currentPt
+  LDR R1,[R0]       ;R1 = currentPtr->StackPtr
+  STR SP,[R1]       ;SP store to  currentPtr->StackPtr
+  LDR R1,[R1,#4]    ;R1=currentPtr->nextPtr
+  STR R1,[R0]       ;currentPtr->nextPtr store to currentPtr
+  LDR SP,[R1]       ;currentPtr->StackPtr store to SP
+  POP {R4 - R11}      ;currentPtr->StackPtr storerage to R4-R11
+  CPSIE I 
+  BX LR
+
+
+;HAL_IncTick ; 计数器
+;  LDR R0,=uwTick
+;  LDR R1,[R0]
+;  LDR R2,=uwTickFreq
+;  LDR R3,[R2]
+;  ADD R1,R1,R3
+;  STR R1,[R0]
+;  B L1
+;  ;BX LR
+  
+CONTEXT_SWITCH ; 任务切换
+  CPSID I
+  PUSH{R4 - R11}
+  LDR R0,=currentPt
+  LDR R1,[R0]       ;R1 = currentPtr->StackPtr
+  STR SP,[R1]       ;SP store to  currentPtr->StackPtr
+  LDR R1,[R1,#4]    ;R1=currentPtr->nextPtr
+  STR R1,[R0]       ;currentPtr->nextPtr store to currentPtr
+  LDR SP,[R1]       ;currentPtr->StackPtr store to SP
+  POP {R4 - R11}      ;currentPtr->StackPtr storerage to R4-R11
+  CPSIE I 
+  BX LR
+
+osSchedulerLauch
+    LDR     R0, =currentPt         
+    LDR     R2, [R0]       ; R2 =currentPt       
+    LDR     SP, [R2]       ;SP = currentPt->stackPt    
+    POP     {R4-R11}          
+    POP     {R0-R3}            
+    POP     {R12}
+    ADD     SP,SP,#4           
+    POP     {LR}               
+    ADD     SP,SP,#4         
+    CPSIE   I                 
+    BX      LR                 
+
+
+
+
+ALIGN
+END

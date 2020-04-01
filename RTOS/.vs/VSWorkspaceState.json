@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Drivers",
+    "\\Drivers\\CMSIS",
+    "\\Drivers\\CMSIS\\Core_A",
+    "\\Drivers\\STM32F4xx_HAL_Driver",
+    "\\Drivers\\STM32F4xx_HAL_Driver\\Src",
+    "\\Inc",
+    "\\MDK-ARM",
+    "\\Src"
+  ],
+  "SelectedNode": "\\MDK-ARM",
+  "PreviewInSolutionExplorer": false
+}
